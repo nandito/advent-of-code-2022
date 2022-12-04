@@ -26,6 +26,13 @@ local function find(a, tbl)
     for _,a_ in ipairs(tbl) do if a_==a then return true end end
 end
 
+-- PART 1
+
+---Checks if list1 contains all of list2's elements and vice versa
+---@param list1 table with numbers in a given range
+---@param list2 table with numbers in a given range
+---@return boolean list1 is fully covered by list2
+---@return boolean list2 is fully covered by list1
 local function are_lists_fully_overlap(list1, list2)
     local list1_contains_list2 = true
     for _,section in pairs(list1) do
@@ -40,14 +47,36 @@ local function are_lists_fully_overlap(list1, list2)
     return list1_contains_list2, list2_contains_list1
 end
 
-local full_overlap_counter = 0
+-- PART 2
+
+---Checks if list1 contains any elements which are in list2
+---@param list1 table with numbers in a given range
+---@param list2 table with numbers in a given range
+---@return boolean true if there's at least one common number in the 2 lists
+local function are_lists_partially_overlap(list1, list2)
+    local has_overlap = false
+    for _,section in pairs(list1) do
+        if find(section, list2) then has_overlap = true end
+    end
+
+    return has_overlap
+end
+
+local full_overlap_counter = 0 -- for part 1
+local has_overlap_counter = 0  -- for part 2
 for _, line in pairs(lines) do
     local list1, list2 = get_lists(line)
     local l1_in_l2, l2_in_l1 = are_lists_fully_overlap(list1, list2)
+    local has_partial_overlap = are_lists_partially_overlap(list1, list2)
 
     if l1_in_l2 or l2_in_l1 then
         full_overlap_counter = full_overlap_counter + 1
     end
+
+    if has_partial_overlap then
+        has_overlap_counter = has_overlap_counter + 1
+    end
 end
 
-print("Part 1: range overlap count: ", full_overlap_counter)
+print("Part 1: ranges with fully overlap count: ", full_overlap_counter)
+print("Part 2: ranges with some  overlap count: ", has_overlap_counter)
