@@ -6,15 +6,11 @@ local lines = aocutils.lines_from(file)
 
 local ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-local function find(a, tbl)
-    for _,a_ in ipairs(tbl) do if a_==a then return true end end
-end
-
 -- returns a table with the given 2 tables' common elements
 local function get_commons(a, b)
    local ret = {}
    for _,a_ in ipairs(a) do
-       if find(a_,b) then
+       if aocutils.find(a_,b) then
            table.insert(ret, a_)
        end
    end

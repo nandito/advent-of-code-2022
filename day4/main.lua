@@ -22,10 +22,6 @@ local function get_lists(pair)
     return first_list, second_list
 end
 
-local function find(a, tbl)
-    for _,a_ in ipairs(tbl) do if a_==a then return true end end
-end
-
 -- PART 1
 
 ---Checks if list1 contains all of list2's elements and vice versa
@@ -36,12 +32,12 @@ end
 local function are_lists_fully_overlap(list1, list2)
     local list1_contains_list2 = true
     for _,section in pairs(list1) do
-        if not find(section, list2) then list1_contains_list2 = false end
+        if not aocutils.find(section, list2) then list1_contains_list2 = false end
     end
 
     local list2_contains_list1 = true
     for _,section in pairs(list2) do
-        if not find(section, list1) then list2_contains_list1 = false end
+        if not aocutils.find(section, list1) then list2_contains_list1 = false end
     end
 
     return list1_contains_list2, list2_contains_list1
@@ -56,7 +52,7 @@ end
 local function are_lists_partially_overlap(list1, list2)
     local has_overlap = false
     for _,section in pairs(list1) do
-        if find(section, list2) then has_overlap = true end
+        if aocutils.find(section, list2) then has_overlap = true end
     end
 
     return has_overlap
@@ -78,5 +74,10 @@ for _, line in pairs(lines) do
     end
 end
 
+-- expected output for sample.txt: 2
+-- accepted output for input.txt:  536
 print("Part 1: ranges with fully overlap count: ", full_overlap_counter)
+
+-- expected output for sample.txt: 4
+-- accepted output for input.txt:  845
 print("Part 2: ranges with some  overlap count: ", has_overlap_counter)
