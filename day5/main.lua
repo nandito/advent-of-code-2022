@@ -10,14 +10,6 @@ local stack_elements = {}
 local stacks = {}
 local moves = List()
 
-local function find_index(a, tbl)
-    local idx = nil
-    for i, v in pairs(tbl) do
-        if a == v then idx = i end
-    end
-    return idx
-end
-
 local sample_stack_index_pattern = "(%d)%s*(%d)%s*(%d)"
 local sample_stack_line_pattern = "[^%d%s%l]"
 local move_line_pattern = "move (%d+) from (%d+) to (%d+)"
@@ -66,19 +58,32 @@ for _, line in pairs(lines) do
 end
 
 local stack_state = Map{}
+local stack_state_copy = Map{}
 
 for _, se in pairs(stack_elements) do
     for ii, se2 in pairs(se) do
         local existingList = stack_state:get(""..ii)
         if se2 == " " then 
         elseif existingList then
-            stack_state:set(""..ii, existingList:insert(1,se2))
+            local updatedList =  existingList:insert(1,se2)
+            stack_state:set(""..ii,updatedList)
+            stack_state_copy:set(""..ii, updatedList:clone())
         else
             local ls = List()
             ls:append(se2)
             stack_state:set(""..ii, ls)
+            stack_state_copy:set(""..ii, ls:clone())
         end
     end
+end
+
+local function getTops(stks, state)
+    local topElements = "" 
+    for key,_  in pairs(stks) do
+        local stk = state:get(""..key)
+        topElements = topElements .. stk[#stk]
+    end
+    return topElements
 end
 
 -- PART 1
@@ -95,14 +100,22 @@ for move in moves:iter() do
         stack_state:set(""..to, targetCol:append(elementToMove))
         stack_state:set(""..from, sourceCol:remove(#sourceCol))
     end
-
-    stack_state:get(""..from)
 end
 
-local topElements = "" 
-for key,_  in pairs(stacks) do
-    local stack = stack_state:get(""..key)
-    topElements = topElements .. stack[#stack]
+-- PART 2
+-- make the moves
+for move in moves:iter() do
+    local count = move[1]
+    local from = move[2]
+    local to = move[3]
+
+    local sourceCol = stack_state_copy:get(""..from)
+
+    local elementsToMove = sourceCol:slice(-count)
+    local targetCol = stack_state_copy:get(""..to)
+    stack_state_copy:set(""..to, targetCol:extend(elementsToMove))
+    stack_state_copy:set(""..from, sourceCol:slice(1, #sourceCol-count))
 end
 
-print("Part 1 - top elements:", topElements)
+print("Part 1 - top elements:", getTops(stacks, stack_state))
+print("Part 2 - top elements:", getTops(stacks, stack_state_copy))
