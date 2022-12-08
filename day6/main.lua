@@ -14,24 +14,41 @@ for _, line in pairs(lines) do
    table.insert(linesAsChars, chars)
 end
 
--- PART 1
-for _, chars in pairs(linesAsChars) do
-    local potentialSignalChars = List()
-    local potentialSignalStartIdx = 1
+---Gets the signal marker index
+---@param signalMarker number
+---@return table
+local function getSignal(signalMarker)
+    local signalStartIdxs = {}
+    for _, chars in pairs(linesAsChars) do
+        local potentialSignalChars = List()
+        local potentialSignalStartIdx = 1
 
-    for idx, c in pairs(chars) do
-        if potentialSignalChars:contains(c) then
-            local idxToRemove = potentialSignalChars:index(c)
-            potentialSignalChars:chop(1, idxToRemove)
-        end
-        potentialSignalChars:append(c)
+        for idx, c in pairs(chars) do
+            if potentialSignalChars:contains(c) then
+                local idxToRemove = potentialSignalChars:index(c)
+                potentialSignalChars:chop(1, idxToRemove)
+            end
+            potentialSignalChars:append(c)
 
-        if #potentialSignalChars == 4 then
-            potentialSignalStartIdx = idx
-            break
+            if #potentialSignalChars == signalMarker then
+                potentialSignalStartIdx = idx
+                break
+            end
         end
+
+        table.insert(signalStartIdxs, potentialSignalStartIdx)
     end
-
-    print(potentialSignalChars)
-    print(potentialSignalStartIdx)
+    return signalStartIdxs
 end
+
+-- expected for sample.txt
+-- 7, 5, 6, 10, 11
+-- submitted and approved for input.txt
+-- 1578
+print("Part 1 - signal start markers at position 4:  " .. table.concat(getSignal(4), ", "))
+
+-- expected for sample.txt
+-- 19, 23, 23, 29, 26
+-- submitted and approved for input.txt
+-- 2178
+print("Part 2 - signal start markers at position 14: " .. table.concat(getSignal(14), ", "))
