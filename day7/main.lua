@@ -77,43 +77,41 @@ for _, line in pairs(lines) do
 end
 
 local LIMIT = 100000
-local function count_dir_size(dir, cache)
-    local total = 0
-    -- print(dir)
-    if type(dir) == "string" then
-        local size = string.match(dir, "(%d+)")
-        total = total + size
-    else
-        for _,elem in pairs(dir) do
-            if type(elem) =="string" then
-                local size = string.match(elem, "(%d+)")
-                total = total + size
-            else
-                total = count_dir_size(elem, cache)
-                -- map's shouldn't be counted twice
-                -- elem.index is a bit hacky but it tells if it
-                -- is a map or a list (map doesn't have index)
-                print(elem)
-                if total <= LIMIT and elem.index then
-                    cache:append(total)
-                end
-            end
-        end
-    end
-    return total
-end
 
 local dir_sizes = List()
 local cache = List()
-for elem in fs:iter() do
-    dir_sizes:append(count_dir_size(elem, cache))
+
+local function calc(elements)
+    local dir_total = 0
+
+    for elem in elements:iter() do
+        local size = 0
+        if type(elem) == "string" then
+            size = string.match(elem, "(%d+)")
+            if size == nil then
+                size = calc(elements[elem])
+            end
+        else
+            size = calc(elem)
+        end
+        dir_total = dir_total + size
+    end
+    if elements.index and dir_total > 0 then
+        dir_sizes:append(dir_total)
+        if dir_total <= LIMIT then
+            cache:append(dir_total)
+        end
+    end
+    return dir_total
 end
 
--- pretty.dump(fs)
+calc(fs)
+
+pretty.dump(fs)
 local sizes_below_limit = cache:reduce(function(a,b)
     return a+b
 end)
 
-print(dir_sizes)
+-- print(dir_sizes)
 print(cache)
 print(sizes_below_limit)

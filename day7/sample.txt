@@ -21,9 +21,3 @@ $ ls
 8033020 d.log
 5626152 d.ext
 7214296 k
-dir nandi
-$ cd nandi
-$ ls
-dir reka
-10000 p
-10000 r
